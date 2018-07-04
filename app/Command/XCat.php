@@ -28,8 +28,6 @@ class XCat
 	public function boot()
 	{
 		switch ($this->argv[1]) {
-			case("install"):
-					return $this->install();
 			case("createAdmin"):
 				return $this->createAdmin();
 			case("resetTraffic"):
@@ -104,14 +102,9 @@ class XCat
 		}
 	}
 
-	public function install()
-	{
-		echo "x cat will install ss-panel v3...../n";
-	}
-
 	public function initdownload()
 	{
-		system('git clone https://github.com/esdeathlove/panel-download.git '.BASE_PATH."/public/ssr-download/", $ret);
+		system('cd '.BASE_PATH.'/public/ && wget https://github.com/SakuraSa233/panel-download/archive/master.zip && unzip -o master.zip && mv panel-download-master download && rm -f master.zip', $ret);
 		echo $ret;
 	}
 
@@ -202,11 +195,11 @@ class XCat
 
 	public function initQQWry()
 	{
-		echo("downloading....");
-		$copywrite = file_get_contents("https://github.com/esdeathlove/qqwry-download/raw/master/copywrite.rar");
+		echo("Downloading QQWry...");
+		$copywrite = file_get_contents("http://update.cz88.net/ip/copywrite.rar");
 		$newmd5 = md5($copywrite);
 		file_put_contents(BASE_PATH."/storage/qqwry.md5", $newmd5);
-		$qqwry = file_get_contents("https://github.com/esdeathlove/qqwry-download/raw/master/qqwry.rar");
+		$qqwry = file_get_contents("http://update.cz88.net/ip/qqwry.rar");
 		if ($qqwry != "") {
 			$key = unpack("V6", $copywrite)[6];
 			for ($i=0; $i<0x200; $i++) {
@@ -217,11 +210,9 @@ class XCat
 			}
 			$qqwry = gzuncompress($qqwry);
 			$fp = fopen(BASE_PATH."/storage/qqwry.dat", "wb");
-			if ($fp) {
-				fwrite($fp, $qqwry);
-				fclose($fp);
-			}
-			echo("finish....");
+			fwrite($fp, $qqwry);
+			fclose($fp);
+			echo("QQWry download complete.");
 		}
 	}
 }

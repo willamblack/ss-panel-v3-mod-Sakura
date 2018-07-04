@@ -220,16 +220,14 @@ class Job
 
         #https://github.com/shuax/QQWryUpdate/blob/master/update.php
 
-        $copywrite = file_get_contents("https://github.com/esdeathlove/qqwry-download/raw/master/copywrite.rar");
-
-        $adminUser = User::where("is_admin", "=", "1")->get();
+        $copywrite = file_get_contents("http://update.cz88.net/ip/copywrite.rar");
 
         $newmd5 = md5($copywrite);
         $oldmd5 = file_get_contents(BASE_PATH."/storage/qqwry.md5");
 
         if ($newmd5 != $oldmd5) {
             file_put_contents(BASE_PATH."/storage/qqwry.md5", $newmd5);
-            $qqwry = file_get_contents("https://github.com/esdeathlove/qqwry-download/raw/master/qqwry.rar");
+            $qqwry = file_get_contents("http://update.cz88.net/ip/qqwry.rar");
             if ($qqwry != "") {
                 $key = unpack("V6", $copywrite)[6];
                 for ($i=0; $i<0x200; $i++) {
@@ -241,10 +239,8 @@ class Job
                 $qqwry = gzuncompress($qqwry);
                 rename(BASE_PATH."/storage/qqwry.dat", BASE_PATH."/storage/qqwry.dat.bak");
                 $fp = fopen(BASE_PATH."/storage/qqwry.dat", "wb");
-                if ($fp) {
-                    fwrite($fp, $qqwry);
-                    fclose($fp);
-                }
+                fwrite($fp, $qqwry);
+                fclose($fp);
             }
         }
 
@@ -267,8 +263,18 @@ class Job
 
     public static function updatedownload()
     {
-        system('cd '.BASE_PATH."/public/ssr-download/ && git pull", $ret);
-        echo $ret;
+        $old_version_file = file_get_contents(BASE_PATH."/public/download/version.json");
+        $new_version_file = file_get_contents("https://github.com/SakuraSa233/panel-download/raw/master/version.json");
+        if($old_version_file != $new_version_file){
+            $old_versions = json_decode($old_version_file,true);
+            $new_versions = json_decode($new_version_file,true);
+            foreach ($old_versions as $file => $version){
+                if($version != $new_versions[$file]){
+                    system("wget https://github.com/SakuraSa233/panel-download/raw/master/".$file, $ret);
+                    echo $ret;
+                }
+            }
+        }
     }
 
     public static function CheckJob()
