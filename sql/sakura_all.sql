@@ -166,7 +166,8 @@ CREATE TABLE `email_verify` (
   `email` text NOT NULL,
   `ip` text NOT NULL,
   `code` text NOT NULL,
-  `expire_in` bigint(20) NOT NULL
+  `expire_in` bigint(20) NOT NULL,
+  `userid` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------

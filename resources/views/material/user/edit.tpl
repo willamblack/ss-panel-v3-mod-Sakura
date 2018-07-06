@@ -53,6 +53,38 @@
                             <div class="card-main">
                                 <div class="card-inner">
                                     <div class="card-inner">
+                                        <p class="card-heading">修改邮箱</p>
+                                        <div class="form-group form-group-label">
+                                            <div class="row">
+                                                <div class="col-md-10 col-md-push-1">
+                                                    <label class="floating-label" for="email">邮箱</label>
+                                                    <input class="form-control" id="email" type="text">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group form-group-label">
+                                            <div class="row">
+                                                <div class="col-md-10 col-md-push-1">
+                                                    <label class="floating-label" for="email_code">邮箱验证码</label>
+                                                    <input class="form-control" id="email_code" type="text">
+                                                    <button id="email_verify" class="btn btn-block btn-brand-accent waves-attach waves-light">获取验证码</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-action">
+                                        <div class="card-action-btn pull-left">
+                                            <button class="btn btn-flat waves-attach" id="email-update" ><span class="icon">check</span>&nbsp;提交</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card margin-bottom-no">
+                            <div class="card-main">
+                                <div class="card-inner">
+                                    <div class="card-inner">
                                         <p class="card-heading">连接密码修改</p>
                                         <p>当前连接密码：{$user->passwd}</p>
                                         <div class="form-group form-group-label">
@@ -82,7 +114,7 @@
                                             <select id="method" class="form-control">
                                                 {$method_list = $config_service->getSupportParam('method')}
                                                 {foreach $method_list as $method}
-                                                    <option value="{$method}" {if $user->method == $method}selected="selected"{/if}>[{if URL::CanMethodConnect($method) == 2}SS{else}SS/SSR{/if} 可连接] {$method}</option>
+                                                    <option value="{$method}" {if $user->method == $method}selected="selected"{/if}>[{if URL::CanMethodConnect($method) == 2}SS{else}SS/SSR{/if}] {$method}</option>
                                                 {/foreach}
                                             </select>
                                         </div>
@@ -161,7 +193,7 @@
                                             <select id="protocol" class="form-control">
                                                 {$protocol_list = $config_service->getSupportParam('protocol')}
                                                 {foreach $protocol_list as $protocol}
-                                                    <option value="{$protocol}" {if $user->protocol == $protocol}selected="selected"{/if}>[{if URL::CanProtocolConnect($protocol) == 3}SS/SSR{else}SSR{/if} 可连接] {$protocol}</option>
+                                                    <option value="{$protocol}" {if $user->protocol == $protocol}selected="selected"{/if}>[{if URL::CanProtocolConnect($protocol) == 3}SS/SSR{else}SSR{/if}] {$protocol}</option>
                                                 {/foreach}
                                             </select>
                                         </div>
@@ -177,7 +209,7 @@
                                             <select id="obfs" class="form-control">
                                                 {$obfs_list = $config_service->getSupportParam('obfs')}
                                                 {foreach $obfs_list as $obfs}
-                                                    <option value="{$obfs}" {if $user->obfs == $obfs}selected="selected"{/if}>[{if URL::CanObfsConnect($obfs) >= 3}SS/SSR{else}{if URL::CanObfsConnect($obfs) == 1}SSR{else}SS{/if}{/if} 可连接] {$obfs}</option>
+                                                    <option value="{$obfs}" {if $user->obfs == $obfs}selected="selected"{/if}>[{if URL::CanObfsConnect($obfs) >= 3}SS/SSR{else}{if URL::CanObfsConnect($obfs) == 1}SSR{else}SS{/if}{/if}] {$obfs}</option>
                                                 {/foreach}
                                             </select>
                                         </div>
@@ -779,6 +811,80 @@
                     if (data.ret) {
                         $("#result").modal();
                         $("#msg").html("成功了");
+                    } else {
+                        $("#result").modal();
+                        $("#msg").html(data.msg);
+                    }
+                },
+                error: function (jqXHR) {
+                    $("#result").modal();
+                    $("#msg").html(data.msg+"     出现了一些错误。");
+                }
+            })
+        })
+    })
+</script>
+
+<script>
+    var wait=60;
+    function time(o) {
+        if (wait == 0) {
+            o.removeAttr("disabled");
+            o.text("获取验证码");
+            wait = 60;
+        } else {
+            o.attr("disabled","disabled");
+            o.text("重新发送(" + wait + ")");
+            wait--;
+            setTimeout(function() {
+                time(o)
+            },
+            1000)
+        }
+    }
+    $(document).ready(function () {
+        $("#email_verify").click(function () {
+            time($("#email_verify"));
+            $.ajax({
+                type: "POST",
+                url: "verifyEmail",
+                dataType: "json",
+                data: {
+                    email: $("#email").val()
+                },
+                success: function (data) {
+                    if (data.ret) {
+                        $("#result").modal();
+                        $("#msg").html(data.msg);
+                    } else {
+                        $("#result").modal();
+                        $("#msg").html(data.msg);
+                    }
+                },
+                error: function (jqXHR) {
+                    $("#result").modal();
+                    $("#msg").html(data.msg+"     出现了一些错误。");
+                }
+            })
+        })
+    })
+</script>
+
+<script>
+    $(document).ready(function () {
+        $("#email-update").click(function () {
+            $.ajax({
+                type: "POST",
+                url: "email",
+                dataType: "json",
+                data: {
+                    email: $("#email").val(),
+                    code: $("#email_code").val()
+                },
+                success: function (data) {
+                    if (data.ret) {
+                        $("#result").modal();
+                        $("#msg").html(data.msg);
                     } else {
                         $("#result").modal();
                         $("#msg").html(data.msg);

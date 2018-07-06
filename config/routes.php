@@ -127,6 +127,8 @@ $app->group('/user', function () {
     $this->post('/ssr', 'App\Controllers\UserController:updateSSR');
     $this->post('/theme', 'App\Controllers\UserController:updateTheme');
     $this->post('/mail', 'App\Controllers\UserController:updateMail');
+    $this->post('/email','App\Controllers\UserController:updateEmail');
+    $this->post('/verifyEmail','App\Controllers\UserController:verifyEmail');
     $this->post('/sspwd', 'App\Controllers\UserController:updateSsPwd');
     $this->post('/method', 'App\Controllers\UserController:updateMethod');
     $this->post('/hide', 'App\Controllers\UserController:updateHide');

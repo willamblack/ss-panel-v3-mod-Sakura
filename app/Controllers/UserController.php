@@ -13,11 +13,13 @@ use App\Models\Shop;
 use App\Models\Coupon;
 use App\Models\Bought;
 use App\Models\Ticket;
+use App\Models\EmailVerify;
 use App\Services\Config;
 use App\Utils\Hash;
 use App\Utils\Tools;
 use App\Utils\Radius;
 use App\Utils\Wecenter;
+use App\Utils\Check;
 use App\Models\RadiusBan;
 use App\Models\DetectLog;
 use App\Models\DetectRule;
@@ -1306,6 +1308,100 @@ class UserController extends BaseController
         $res['ret'] = 1;
         $res['msg'] = "ok";
         return $this->echoJson($response, $res);
+    }
+
+    public function updateEmail($request, $response, $args)
+    {
+        $email = $request->getParam('email');
+        $code = $request->getParam('code');
+
+        if ($code == "") {
+            $res['ret'] = 0;
+            $res['msg'] = "你似乎没有填写你的验证码";
+            return $response->getBody()->write(json_encode($res));
+        }
+
+        if (!Check::isEmailLegal($email)) {
+            $res['ret'] = 0;
+            $res['msg'] = "邮箱无效";
+            return $response->getBody()->write(json_encode($res));
+        }
+
+        $user = $this->user;
+        $mailcount = EmailVerify::where('userid', '=', $user->id)->where('code', '=', $code)->where('expire_in', '>', time())->first();
+        if ($mailcount == null) {
+            $res['ret'] = 0;
+            $res['msg'] = "您的邮箱验证码不正确";
+            return $response->getBody()->write(json_encode($res));
+        }
+        EmailVerify::where('email', '=', $email)->delete();
+
+        $user->email = $email;
+        $user->save();
+
+        $res['ret'] = 1;
+        $res['msg'] = "修改成功！";
+        return $response->getBody()->write(json_encode($res));
+    }
+
+    public function verifyEmail($request, $response, $next)
+    {
+        $email = $request->getParam('email');
+
+        if ($email=="") {
+            $res['ret'] = 0;
+            $res['msg'] = "哦？你填了你的邮箱了吗？";
+            return $response->getBody()->write(json_encode($res));
+        }
+
+        // check email format
+        if (!Check::isEmailLegal($email)) {
+            $res['ret'] = 0;
+            $res['msg'] = "邮箱无效";
+            return $response->getBody()->write(json_encode($res));
+        }
+
+        $user = $this->user;
+
+        $users = User::where("email","=",$email)->first();
+        if ($users != null){
+            $res['ret'] = 0;
+            $res['msg'] = "此邮箱已被使用。";
+            return $response->getBody()->write(json_encode($res));
+        }
+
+        $ipcount = EmailVerify::where('userid', '=', $user->id)->where('expire_in', '>', time())->count();
+        if ($ipcount>=(int)Config::get('email_verify_iplimit')) {
+            $res['ret'] = 0;
+            $res['msg'] = "你的请求次数过多，请稍候再试";
+            return $response->getBody()->write(json_encode($res));
+        }
+
+        $code = Tools::genRandomChar(6);
+
+        $ev = new EmailVerify();
+        $ev->expire_in = time() + Config::get('email_verify_ttl');
+        $ev->ip = $_SERVER["REMOTE_ADDR"];
+        $ev->email = $email;
+        $ev->code = $code;
+        $ev->userid = $user->id;
+        $ev->save();
+
+        $subject = Config::get('appName')."- 验证邮件";
+
+        try {
+            Mail::send($email, $subject, 'auth/verify.tpl', [
+                "code" => $code,"expire" => date("Y-m-d H:i:s", time() + Config::get('email_verify_ttl'))
+            ], [
+                //BASE_PATH.'/public/assets/email/styles.css'
+            ]);
+        } catch (Exception $e) {
+            return false;
+        }
+
+        $res['ret'] = 1;
+        $res['msg'] = "验证码发送成功，请查收邮件。";
+        return $response->getBody()->write(json_encode($res));
     }
 
     public function PacSet($request, $response, $args)

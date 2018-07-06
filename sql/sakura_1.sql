@@ -1,0 +1,1 @@
+ALTER TABLE `email_verify` ADD `userid` bigint(20) NULL DEFAULT NULL AFTER `expire_in`;
