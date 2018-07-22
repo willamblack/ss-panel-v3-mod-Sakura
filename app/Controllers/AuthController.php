@@ -49,7 +49,7 @@ class AuthController extends BaseController
             $login_number = '';
         }
 
-        return $this->view()->assign('geetest_html', $GtSdk)->assign('login_token', $login_token)->assign('login_number', $login_number)->assign('telegram_bot', Config::get('telegram_bot'))->display('auth/login.tpl');
+        return $this->view()->assign('geetest_html', $GtSdk)->assign('login_token', $login_token)->assign('login_number', $login_number)->assign('telegram_bot', Config::get('telegram_bot'))->assign('baseUrl', Config::get('baseUrl'))->display('auth/login.tpl');
     }
 
     public function loginHandle($request, $response, $args)
@@ -150,14 +150,19 @@ class AuthController extends BaseController
         $rs['ret'] = 1;
         $rs['msg'] = "欢迎回来";
 
-        $loginip=new LoginIp();
-        $loginip->ip=$_SERVER["REMOTE_ADDR"];
-        $loginip->userid=$user->id;
-        $loginip->datetime=time();
-        $loginip->type=0;
-        $loginip->save();
+        $this->logUserIp($user->id, $_SERVER["REMOTE_ADDR"]);
 
         return $response->getBody()->write(json_encode($rs));
+    }
+
+    private function logUserIp($id, $ip)
+    {
+        $loginip = new LoginIp();
+        $loginip->ip = $ip;
+        $loginip->userid = $id;
+        $loginip->datetime = time();
+        $loginip->type = 0;
+        $loginip->save();
     }
 
     public function register($request, $response, $next)
@@ -427,5 +432,46 @@ class AuthController extends BaseController
             $res['ret'] = 0;
             return $response->getBody()->write(json_encode($res));
         }
+    }
+
+    public function telegram_oauth($request, $response, $args)
+    {
+        if (Config::get('enable_telegram') == 'true') {
+            $auth_data = $request->getQueryParams();
+            if ($this->telegram_oauth_check($auth_data)) {
+                $telegram_id = $auth_data['id'];
+                $user = User::query()->where('telegram_id', $telegram_id)->firstOrFail();
+
+                Auth::login($user->id, 3600);
+                $this->logUserIp($user->id, $_SERVER["REMOTE_ADDR"]);
+
+                return $response->withRedirect('/user');
+            }
+            return $response->withRedirect('/auth/login');
+        }
+        return $response->withRedirect('/404');
+    }
+
+    private function telegram_oauth_check($auth_data)
+    {
+        $check_hash = $auth_data['hash'];
+        $bot_token = Config::get('telegram_token');;
+        unset($auth_data['hash']);
+        $data_check_arr = [];
+        foreach ($auth_data as $key => $value) {
+            $data_check_arr[] = $key . '=' . $value;
+        }
+        sort($data_check_arr);
+        $data_check_string = implode("\n", $data_check_arr);
+        $secret_key = hash('sha256', $bot_token, true);
+        $hash = hash_hmac('sha256', $data_check_string, $secret_key);
+        if (strcmp($hash, $check_hash) !== 0) {
+            return false;
+        }
+        if ((time() - $auth_data['auth_date']) > 300) {
+            return false;
+        }
+
+        return true;
     }
 }
