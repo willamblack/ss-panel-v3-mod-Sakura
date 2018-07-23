@@ -442,7 +442,7 @@ class AuthController extends BaseController
                 $telegram_id = $auth_data['id'];
                 $user = User::query()->where('telegram_id', $telegram_id)->firstOrFail();
 
-                Auth::login($user->id, 3600);
+                Auth::login($user->id, 3600*24);
                 $this->logUserIp($user->id, $_SERVER["REMOTE_ADDR"]);
 
                 return $response->withRedirect('/user');
