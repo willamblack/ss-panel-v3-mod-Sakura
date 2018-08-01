@@ -328,8 +328,10 @@ class UserController extends BaseController
     {
         $id = $args['id'];
         $point_node=Node::find($id);
-        $prefix=explode(" - ", $point_node->name);
-        return $this->view()->assign('point_node', $point_node)->assign('prefix', $prefix[0])->assign('id', $id)->display('user/nodeajax.tpl');
+        return $this->view()
+                    ->assign('point_node', $point_node)
+                    ->assign('id', $id)
+                    ->display('user/nodeajax.tpl');
     }
 
 
@@ -417,7 +419,7 @@ class UserController extends BaseController
                     }
 
                     if ($node->node_bandwidth_limit==0) {
-                        $node_bandwidth[$temp[0]]=(int)($node->node_bandwidth/1024/1024/1024)." GB / 不限";
+                        $node_bandwidth[$temp[0]]=(int)($node->node_bandwidth/1024/1024/1024)." GB";
                     } else {
                         $node_bandwidth[$temp[0]]=(int)($node->node_bandwidth/1024/1024/1024)." GB / ".(int)($node->node_bandwidth_limit/1024/1024/1024)." GB - ".$node->bandwidthlimit_resetday." 日重置";
                     }

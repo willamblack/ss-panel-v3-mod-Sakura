@@ -506,7 +506,7 @@ class Job
             $nodes = Node::all();
 
             /**
-             * Detect offline node and update a new dns record for its domain.
+             * Detect node status and update dns record for its domain.
              * @author glzjin && SakuraSa233
              */
             foreach ($nodes as $node) {
@@ -599,13 +599,7 @@ class Job
                     fwrite($myfile, $txt);
                     fclose($myfile);
                 }
-            }
 
-            /**
-             * Detect recovered offline node and update origin dns record for its domain.
-             * @author glzjin && SakuraSa233
-             */
-            foreach ($nodes as $node) {
                 if (time()-$node->node_heartbeat<60&&file_exists(BASE_PATH."/storage/".$node->id.".offline")&&$node->node_heartbeat!=0&&($node->sort==0||$node->sort==7||$node->sort==8||$node->sort==10)) {
                     foreach ($adminUser as $user) {
                         $subject = Config::get('appName')."-系统提示";

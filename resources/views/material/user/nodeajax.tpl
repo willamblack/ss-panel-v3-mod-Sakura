@@ -12,7 +12,7 @@
             chart{$id} = new CanvasJS.Chart("load{$id}_chart",
             {
                 title:{
-                    text: "节点负载情况 {$prefix}"
+                    text: "节点负载"
                 },
                 data: [
                 {
@@ -50,7 +50,7 @@
             up_chart{$id} = new CanvasJS.Chart("up{$id}_chart",
             {
                 title:{
-                    text: "最近一天节点在线情况 {$prefix} - 在线 {$point_node->getNodeUptime()}"
+                    text: "最近一天节点在线率 - 已保持开机 {$point_node->getNodeUptime()}"
                 },
                 data: [
                     {
@@ -78,7 +78,7 @@
             alive_chart{$id} = new CanvasJS.Chart("alive{$id}_chart",
             {
                 title:{
-                    text: "最近一天节点在线人数情况 {$prefix}"
+                    text: "近期节点在线人数"
                 },
                 data: [
                 {
@@ -117,7 +117,7 @@
             speedtest_chart{$id} = new CanvasJS.Chart("speedtest{$id}_chart",
             {
                 title:{
-                    text: "最近节点测速延时情况报告 {$prefix}"
+                    text: "近期节点延迟"
                 },
                 axisY: {				
                     suffix: " ms"
@@ -155,7 +155,7 @@
                 {
                     type: "line", 
                     showInLegend: true,
-                    legendText: "联通延时",
+                    legendText: "联通延迟",
                     dataPoints: [
                         {$i=0}
                         {foreach $speedtests as $single_speedtest}
@@ -184,7 +184,7 @@
                 {
                     type: "line", 
                     showInLegend: true,
-                    legendText:"移动延时",
+                    legendText:"移动延迟",
                     dataPoints: [
                         {$i=0}
                         {foreach $speedtests as $single_speedtest}
@@ -216,7 +216,7 @@
             speedtest_ping_chart{$id} = new CanvasJS.Chart("speedtest{$id}_ping_chart",
             {
                 title:{
-                    text: "最近节点测速速度情况报告 {$prefix}"
+                    text: "近期节点速度"
                 },
                 axisY: {				
                     suffix: " Mbps"

@@ -49,11 +49,20 @@
                                                         <div data-toggle="tile" data-target="#heading{$node_order->$prefix}">
                                                             <div class="tile-side pull-left" data-ignore="tile">
                                                                 <div class="avatar avatar-sm">
-                                                                    <span class="icon {if $node_heartbeat[$prefix]=='在线'}text-green{else}{if $node_heartbeat[$prefix]=='暂无数据'}text-orange{else}text-red{/if}{/if}">{if $node_heartbeat[$prefix]=="在线"}backup{else}{if $node_heartbeat[$prefix]=='暂无数据'}report{else}warning{/if}{/if}</span>
+                                                                    <span class="icon
+                                                                        {if $node_heartbeat[$prefix]=='在线'}text-green">backup
+                                                                        {else}
+                                                                            {if $node_heartbeat[$prefix]=='暂无数据'}text-orange">report
+                                                                            {else}text-red">warning
+                                                                            {/if}
+                                                                        {/if}
+                                                                    </span>
                                                                 </div>
                                                             </div>
                                                             <div class="tile-inner">
-                                                                <div class="text-overflow">{$prefix} | <i class="icon icon-lg">person</i> {$node_alive[$prefix]} | <i class="icon icon-lg">build</i> {$node_method[$prefix]} | <i class="icon icon-lg">traffic</i> {if isset($node_bandwidth[$prefix])==true}{$node_bandwidth[$prefix]}{else}N/A{/if}</div>
+                                                                <div class="text-overflow">
+                                                                    {$prefix} | <i class="icon icon-lg">person</i> {$node_alive[$prefix]} | <i class="icon icon-lg">build</i> {$node_method[$prefix]} | <i class="icon icon-lg">traffic</i> {$node_bandwidth[$prefix]}
+                                                                </div>
                                                             </div>
                                                         </div>
                                                         <div class="collapsible-region collapse" id="heading{$node_order->$prefix}">
