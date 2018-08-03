@@ -865,7 +865,6 @@ class Job
             }
 
             $user->save();
-        }
 
             if ($user->class!=0 && (strtotime($user->class_expire) - time() < 259200) && (259240 <= strtotime($user->class_expire) - time()) && strtotime($user->class_expire) > 1420041600) {
                 $subject = Config::get('appName')."-您的用户等级即将在3天后过期";
@@ -880,6 +879,7 @@ class Job
                     echo $e->getMessage();
                 }
             }
+        }
 
 
         $rbusers = RadiusBan::all();
