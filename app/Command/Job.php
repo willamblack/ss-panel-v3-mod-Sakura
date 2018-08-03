@@ -18,6 +18,7 @@ use App\Models\DetectLog;
 use App\Models\BlockIp;
 use App\Models\TelegramSession;
 use App\Models\EmailVerify;
+use App\Models\Relay;
 use App\Services\Config;
 use App\Utils\Radius;
 use App\Utils\Wecenter;
@@ -316,6 +317,13 @@ class Job
                 if($ip!=$node->node_ip){
                     $node->node_ip=$ip;
                     $node->save();
+                    if ($node->sort == 10){
+                        $relay_rules = Relay::where('dist_node_id', $node->id)->get();
+                        foreach($relay_rules as $relay_rule){
+                            $relay_rule->dist_ip = $ip;
+                            $relay_rule->save();
+                        }
+                    }
                 }
             }
         }
