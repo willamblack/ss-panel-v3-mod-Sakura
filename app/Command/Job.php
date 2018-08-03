@@ -280,7 +280,7 @@ class Job
 
     public static function CheckJob()
     {
-        //在线人数检测
+        // Detect connect quantity begin
         $users = User::where('node_connector', '>', 0)->get();
 
         $full_alive_ips = Ip::where("datetime", ">=", time()-60)->orderBy("ip")->get();
@@ -301,32 +301,6 @@ class Job
             $alive_ipset[$full_alive_ip->userid]->append($full_alive_ip);
         }
 
-        /**
-         * Sync $node->node_ip for dynamic ip node.
-         * @author SakuraSa233
-         */
-        $nodes = Node::where("dns_type",">","1")->get(); // exclude static ip and unused node
-        foreach ($nodes as $node) {
-            if ($node->sort!=999 && $node->sort!=9) {
-                if ($node->dns_type=="2"){
-                    $sync_host=$node->dns_value;    // dynamic CNAME
-                }else{
-                    $sync_host=$node->server;   // dynamic A
-                }
-                $ip=gethostbyname($sync_host);
-                if($ip!=$node->node_ip){
-                    $node->node_ip=$ip;
-                    $node->save();
-                    if ($node->sort == 10){
-                        $relay_rules = Relay::where('dist_node_id', $node->id)->get();
-                        foreach($relay_rules as $relay_rule){
-                            $relay_rule->dist_ip = $ip;
-                            $relay_rule->save();
-                        }
-                    }
-                }
-            }
-        }
 
 
         foreach ($users as $user) {
@@ -339,7 +313,7 @@ class Job
                 if (!isset($ips[$alive_ip->ip]) && !in_array($alive_ip->ip, $disconnected_ips)) {
                     $ips[$alive_ip->ip]=1;
                     if ($user->node_connector < count($ips)) {
-                        //暂时封禁
+                        // Block connect begin
                         $isDisconnect = Disconnect::where('id', '=', $alive_ip->ip)->where('userid', '=', $user->id)->first();
 
                         if ($isDisconnect == null) {
@@ -356,12 +330,14 @@ class Job
                             }
                             $user->save();
                         }
+                        // Block connect end
                     }
                 }
             }
         }
+        // Detect online quantity end
 
-        //解封
+        // Unblock IP begin
         $disconnecteds = Disconnect::where("datetime", "<", time()-300)->get();
         foreach ($disconnecteds as $disconnected) {
             $user = User::where('id', '=', $disconnected->userid)->first();
@@ -391,8 +367,9 @@ class Job
 
             $disconnected->delete();
         }
+        // Unblock IP end
 
-        //auto renew
+        // Auto renew Begin
         $boughts=Bought::where("renew", "<", time())->where("renew", "<>", 0)->get();
         foreach ($boughts as $bought) {
             $user=User::where("id", $bought->userid)->first();
@@ -464,15 +441,16 @@ class Job
                 }
             }
         }
+        // Auto renew end
 
+        // Database clean start
         Ip::where("datetime", "<", time()-300)->delete();
         UnblockIp::where("datetime", "<", time()-300)->delete();
         BlockIp::where("datetime", "<", time()-86400)->delete();
         TelegramSession::where("datetime", "<", time()-900)->delete();
+        // Database clean end
 
-
-        $adminUser = User::where("is_admin", "=", "1")->get();
-
+        // Panel version detect begin
         $latest_content = file_get_contents("https://github.com/SakuraSa233/ss-panel-v3-mod-Sakura/raw/master/bootstrap.php");
         $newmd5 = md5($latest_content);
         $oldmd5 = md5(file_get_contents(BASE_PATH."/bootstrap.php"));
@@ -484,6 +462,7 @@ class Job
                 }
             } else {
                 if (!file_exists(BASE_PATH."/storage/update.md5")) {
+                    $adminUser = User::where("is_admin", "=", "1")->get();
                     foreach ($adminUser as $user) {
                         $subject = Config::get('appName')."-系统提示";
                         $to = $user->email;
@@ -507,46 +486,73 @@ class Job
                 }
             }
         }
+        // Panel version detect end
 
 
-        //节点掉线检测
-        if (Config::get("node_offline_warn")=="true") {
+        /**
+         * Process node
+         * @author glzjin && SakuraSa233
+         */
+        // Process node begin
             $nodes = Node::all();
+        foreach ($nodes as $node) {
 
             /**
-             * Detect node status and update dns record for its domain.
-             * @author glzjin && SakuraSa233
+             * Sync node ip in ss_node and relay table
+             * @author SakuraSa233
              */
+            // Sync node begin
+            if ($node->dns_type > 1){
             foreach ($nodes as $node) {
+                    if ($node->sort != 999 && $node->sort != 9) {
+                        if ($node->dns_type == 2){
+                            $sync_host = $node->dns_value;    // dynamic CNAME
+                        }else{
+                            $sync_host = $node->server;   // dynamic A
+                        }
+                        $ip = gethostbyname($sync_host);
+                        if ($ip != $node->node_ip){
+                            // process ss_node table
+                            $node->node_ip=$ip;
+                            $node->save();
+                        }
+                    }
+                }
+            }
+            // Sync node end
+
+            // Process node offline start
                 if ($node->isNodeOnline() === false && time() - $node->node_heartbeat <= 360) {
+                if (Config::get('node_offline_warn') == true){
                     foreach ($adminUser as $user) {
-                        $subject = Config::get('appName')."-系统警告";
+                        $subject = Config::get('appName').'-系统警告';
                         $to = $user->email;
-                        $text = "管理员您好，系统发现节点 ".$node->name." 掉线了，请您及时处理。" ;
+                        $text = '管理员您好，系统发现节点 '.$node->name.' 掉线了，请您及时处理。' ;
                         try {
                             Mail::send($to, $subject, 'news/warn.tpl', [
-                                "user" => $user,"text" => $text
+                                'user' => $user,'text' => $text
                             ], [
                             ]);
                         } catch (Exception $e) {
                             echo $e->getMessage();
                         }
                     }
-                    $notice_text = "喵喵喵~ ".$node->name." 节点掉线了喵~";
-                    if (($node->sort==0 || $node->sort==10) && Config::get("node_switcher") != "none"){
+                }
+                $notice_text = '喵喵喵~ '.$node->name.' 节点掉线了喵~';
+                if (($node->sort==0 || $node->sort==10) && Config::get('node_switcher') != none){
                         $Temp_node = Node::where('node_class', '<=', $node->node_class)->where(
                             function ($query) use ($node) {
-                                $query->where("node_group", "=", $node->node_group)
-                                    ->orWhere("node_group", "=", 0);
+                            $query->where('node_group', '=', $node->node_group)
+                                ->orWhere('node_group', '=', 0);
                             }
                         )->whereRaw('UNIX_TIMESTAMP()-`node_heartbeat`<300')->inRandomOrder()->first();
 
-                        switch(Config::get("node_switcher"))
+                    switch(Config::get('node_switcher'))
                         {
-                            case "cloudxns":
+                        case 'cloudxns':
                                 $api=new Api();
-                                $api->setApiKey(Config::get("cloudxns_apikey"));//修改成自己API KEY
-                                $api->setSecretKey(Config::get("cloudxns_apisecret"));//修改成自己的SECERET KEY
+                            $api->setApiKey(Config::get('cloudxns_apikey'));
+                            $api->setSecretKey(Config::get('cloudxns_apisecret'));
 
                                 $api->setProtocol(true);
 
@@ -571,7 +577,7 @@ class Job
                                 }
                                 break;
                                 
-                            case "cloudflare":
+                        case 'cloudflare':
                                 // define header
                                 $headers = [
                                     'X-Auth-Email: '.Config::get('cloudflare_email'),
@@ -597,46 +603,50 @@ class Job
                                 curl_close($RecUpdate);
                                 break;
                         }
-                        $notice_text .= "域名解析被切换到了 ".$Temp_node->name." 上了喵~";
+                    $notice_text .= '域名解析被切换到了 ".$Temp_node->name." 上了喵~';
                     }
 
                     Telegram::Send($notice_text);
 
-                    $myfile = fopen(BASE_PATH."/storage/".$node->id.".offline", "w+") or die("Unable to open file!");
-                    $txt = "1";
+                $myfile = fopen(BASE_PATH.'/storage/'.$node->id.'.offline', 'w+') or die('Unable to open file!');
+                $txt = '1';
                     fwrite($myfile, $txt);
                     fclose($myfile);
                 }
+            // Process node offline end
 
-                if (time()-$node->node_heartbeat<60&&file_exists(BASE_PATH."/storage/".$node->id.".offline")&&$node->node_heartbeat!=0&&($node->sort==0||$node->sort==7||$node->sort==8||$node->sort==10)) {
+            // Process node recover begin
+            if (time()-$node->node_heartbeat<60&&file_exists(BASE_PATH.'/storage/'.$node->id.'.offline')&&$node->node_heartbeat!=0&&($node->sort==0||$node->sort==7||$node->sort==8||$node->sort==10)) {
+                if (Config::get('node_offline_warn') == true){
                     foreach ($adminUser as $user) {
-                        $subject = Config::get('appName')."-系统提示";
+                        $subject = Config::get('appName').'-系统提示';
                         $to = $user->email;
-                        $text = "管理员您好，系统发现节点 ".$node->name." 恢复上线了。" ;
+                        $text = '管理员您好，系统发现节点 '.$node->name.' 恢复上线了。' ;
                         try {
                             Mail::send($to, $subject, 'news/warn.tpl', [
-                                "user" => $user,"text" => $text
+                                'user' => $user,'text' => $text
                             ], [
                             ]);
                         } catch (Exception $e) {
                             echo $e->getMessage();
                         }
-
-                        $notice_text = "喵喵喵~ ".$node->name." 节点恢复了喵~";
-                        if (($node->sort==0 || $node->sort==10) && Config::get("node_switcher") != "none"){
+                    }
+                }
+                $notice_text = '喵喵喵~ '.$node->name.' 节点恢复了喵~';
+                if (($node->sort==0 || $node->sort==10) && Config::get('node_switcher') != 'none'){
                             if($node->dns_type==2){
-                                $origin_type = "CNAME";
+                        $origin_type = 'CNAME';
                                 $origin_value = $node->dns_value;
                             }else{
-                                $origin_type = "A";
+                        $origin_type = 'A';
                                 $origin_value = $node->node_ip;
                             }
-                            switch(Config::get("node_switcher"))
+                    switch(Config::get('node_switcher'))
                             {
-                                case "cloudxns":
+                        case 'cloudxns':
                                     $api=new Api();
-                                    $api->setApiKey(Config::get("cloudxns_apikey"));//修改成自己API KEY
-                                    $api->setSecretKey(Config::get("cloudxns_apisecret"));//修改成自己的SECERET KEY
+                            $api->setApiKey(Config::get('cloudxns_apikey'));//修改成自己API KEY
+                            $api->setSecretKey(Config::get('cloudxns_apisecret'));//修改成自己的SECERET KEY
 
                                     $api->setProtocol(true);
 
@@ -657,7 +667,7 @@ class Job
                                             $api->record->recordUpdate($domain_id, $record->host, $origin_value, $origin_type, 55, 600, 1, '', $record_id);
                                         }
                                     }
-                                case "cloudflare":
+                        case 'cloudflare':
                                     // define header
                                     $headers = [
                                         'X-Auth-Email: '.Config::get('cloudflare_email'),
@@ -682,18 +692,18 @@ class Job
                                     curl_exec($RecUpdate);
                                     curl_close($RecUpdate);
                             }
-                            $notice_text .= "域名解析被切换回来了喵~";
-                        }
+                    $notice_text .= '域名解析被切换回来了喵~';
                     }
-
                     Telegram::Send($notice_text);
 
-                    unlink(BASE_PATH."/storage/".$node->id.".offline");
-                }
+                unlink(BASE_PATH.'/storage/'.$node->id.'.offline');
             }
+            // Process node recover end
         }
+        // Process node end
 
-        //登录地检测
+
+        // Detect login location begin
         if (Config::get("login_warn")=="true") {
             $iplocation = new QQWry();
             $Logs = LoginIp::where("datetime", ">", time()-60)->get();
@@ -731,12 +741,13 @@ class Job
                 }
             }
         }
+        // Detect login location end
 
 
 
 
 
-
+        // Process user begin
         $users = User::all();
         foreach ($users as $user) {
             if (($user->transfer_enable<=$user->u+$user->d||$user->enable==0||(strtotime($user->expire_in)<time()&&strtotime($user->expire_in)>644447105))&&RadiusBan::where("userid", $user->id)->first()==null) {
@@ -888,11 +899,12 @@ class Job
                 }
             }
         }
+        // Process user end
 
-
+        // Radius ban begin
         $rbusers = RadiusBan::all();
         foreach ($rbusers as $sinuser) {
-            $user=User::find($sinuser->userid);
+            $user = User::where('id',$sinuser->userid);
 
             if ($user == null) {
                 $sinuser->delete();
@@ -904,5 +916,6 @@ class Job
                 Radius::Add($user, $user->passwd);
             }
         }
+        // Radius ban end
     }
 }
