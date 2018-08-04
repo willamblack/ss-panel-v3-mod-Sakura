@@ -199,7 +199,7 @@ $System_Config['aws_secret_access_key'] = '';
 
 
 // -------------- 节点离线 --------------
-$System_Config['node_offline_warn']='true'; // 启用节点离线通知和解析切换
+$System_Config['node_offline_warn']='true'; // 启用节点离线邮件通知
 
 $System_Config['node_switcher']='none'; // 节点解析切换 可选:cloudxns,cloudflare,none
 // CloudXNS

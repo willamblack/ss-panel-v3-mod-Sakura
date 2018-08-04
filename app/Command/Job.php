@@ -494,7 +494,7 @@ class Job
          * @author glzjin && SakuraSa233
          */
         // Process node begin
-            $nodes = Node::all();
+        $nodes = Node::all();
         foreach ($nodes as $node) {
 
             /**
@@ -503,18 +503,23 @@ class Job
              */
             // Sync node begin
             if ($node->dns_type > 1){
-            foreach ($nodes as $node) {
-                    if ($node->sort != 999 && $node->sort != 9) {
-                        if ($node->dns_type == 2){
-                            $sync_host = $node->dns_value;    // dynamic CNAME
-                        }else{
-                            $sync_host = $node->server;   // dynamic A
-                        }
-                        $ip = gethostbyname($sync_host);
-                        if ($ip != $node->node_ip){
-                            // process ss_node table
-                            $node->node_ip=$ip;
-                            $node->save();
+                if ($node->sort != 999 && $node->sort != 9) {
+                    if ($node->dns_type == 2){
+                        $sync_host = $node->dns_value;    // dynamic CNAME
+                    }else{
+                        $sync_host = $node->server;   // dynamic A
+                    }
+                    $ip = gethostbyname($sync_host);
+                    if ($ip != $node->node_ip){
+                        // process ss_node table
+                        $node->node_ip=$ip;
+                        $node->save();
+                        if ($node->sort == 10){
+                            $relay_rules = Relay::where('dist_node_id',$node->id)->get();
+                            foreach ($relay_rules as $relay_rule){
+                                $relay_rule->dist_ip = $ip;
+                                $relay->save();
+                            }
                         }
                     }
                 }
@@ -522,8 +527,9 @@ class Job
             // Sync node end
 
             // Process node offline start
-                if ($node->isNodeOnline() === false && time() - $node->node_heartbeat <= 360) {
+            if ($node->isNodeOnline() === false && time() - $node->node_heartbeat <= 360) {
                 if (Config::get('node_offline_warn') == true){
+                    $adminUser = User::where("is_admin", "=", "1")->get();
                     foreach ($adminUser as $user) {
                         $subject = Config::get('appName').'-系统警告';
                         $to = $user->email;
@@ -540,84 +546,85 @@ class Job
                 }
                 $notice_text = '喵喵喵~ '.$node->name.' 节点掉线了喵~';
                 if (($node->sort==0 || $node->sort==10) && Config::get('node_switcher') != none){
-                        $Temp_node = Node::where('node_class', '<=', $node->node_class)->where(
-                            function ($query) use ($node) {
-                            $query->where('node_group', '=', $node->node_group)
-                                ->orWhere('node_group', '=', 0);
-                            }
-                        )->whereRaw('UNIX_TIMESTAMP()-`node_heartbeat`<300')->inRandomOrder()->first();
+                    $Temp_node = Node::where('node_class', '<=', $node->node_class)->where(
+                        function ($query) use ($node) {
+                        $query->where('node_group', '=', $node->node_group)
+                            ->orWhere('node_group', '=', 0);
+                        }
+                    )->whereRaw('UNIX_TIMESTAMP()-`node_heartbeat`<300')->inRandomOrder()->first();
 
                     switch(Config::get('node_switcher'))
-                        {
+                    {
                         case 'cloudxns':
-                                $api=new Api();
+                            $api=new Api();
                             $api->setApiKey(Config::get('cloudxns_apikey'));
                             $api->setSecretKey(Config::get('cloudxns_apisecret'));
 
-                                $api->setProtocol(true);
+                            $api->setProtocol(true);
 
-                                $domain_json=json_decode($api->domain->domainList());
+                            $domain_json=json_decode($api->domain->domainList());
 
-                                foreach ($domain_json->data as $domain) {
-                                    if (strpos($domain->domain, Config::get('cloudxns_domain'))!==false) {
-                                        $domain_id=$domain->id;
+                            foreach ($domain_json->data as $domain) {
+                                if (strpos($domain->domain, Config::get('cloudxns_domain'))!==false) {
+                                    $domain_id=$domain->id;
+                                }
+                            }
+
+                            $record_json=json_decode($api->record->recordList($domain_id, 0, 0, 2000));
+
+                            foreach ($record_json->data as $record) {
+                                if (($record->host.".".Config::get('cloudxns_domain'))==$node->server) {
+                                    $record_id=$record->record_id;
+
+                                    if ($Temp_node!=null) {
+                                        $api->record->recordUpdate($domain_id, $record->host, $Temp_node->server, 'CNAME', 55, 60, 1, '', $record_id);
                                     }
                                 }
-
-                                $record_json=json_decode($api->record->recordList($domain_id, 0, 0, 2000));
-
-                                foreach ($record_json->data as $record) {
-                                    if (($record->host.".".Config::get('cloudxns_domain'))==$node->server) {
-                                        $record_id=$record->record_id;
-
-                                        if ($Temp_node!=null) {
-                                            $api->record->recordUpdate($domain_id, $record->host, $Temp_node->server, 'CNAME', 55, 60, 1, '', $record_id);
-                                        }
-                                    }
-                                }
-                                break;
+                            }
+                            break;
                                 
                         case 'cloudflare':
-                                // define header
-                                $headers = [
-                                    'X-Auth-Email: '.Config::get('cloudflare_email'),
-                                    'X-Auth-Key: '.Config::get('cloudflare_key'),
-                                    'Content-type: application/json'
-                                    ];	
-                                // get record id
-                                $getRecID = curl_init();
-                                curl_setopt($getRecID, CURLOPT_URL, 'https://api.cloudflare.com/client/v4/zones/'.Config::get('cloudflare_zoneid').'/dns_records?&name='.$node->server);
-                                curl_setopt($getRecID, CURLOPT_HTTPHEADER, $headers);
-                                curl_setopt($getRecID, CURLOPT_RETURNTRANSFER, true);
-                                $RecID = json_decode(curl_exec($getRecID),true)["result"][0]["id"];
-                                curl_close($getRecID);
-                                // update record
-                                $RecUpdate = curl_init();
-                                curl_setopt($RecUpdate, CURLOPT_URL, 'https://api.cloudflare.com/client/v4/zones/'.Config::get('cloudflare_zoneid').'/dns_records/'.$RecID);
-                                curl_setopt($RecUpdate, CURLOPT_HTTPHEADER, $headers);
-                                curl_setopt($RecUpdate, CURLOPT_RETURNTRANSFER, true);
-                                curl_setopt($RecUpdate, CURLOPT_CUSTOMREQUEST, 'PUT');
-                                $post_data = '{"type":"CNAME","name":"'.$node->server.'","content":"'.$Temp_node->server.'","ttl":'.Config::get('cloudflare_ttl').'}';
-                                curl_setopt($RecUpdate, CURLOPT_POSTFIELDS, $post_data);
-                                $CFResult = json_decode(curl_exec($RecUpdate),true)["success"];
-                                curl_close($RecUpdate);
-                                break;
-                        }
-                    $notice_text .= '域名解析被切换到了 ".$Temp_node->name." 上了喵~';
+                            // define header
+                            $headers = [
+                                'X-Auth-Email: '.Config::get('cloudflare_email'),
+                                'X-Auth-Key: '.Config::get('cloudflare_key'),
+                                'Content-type: application/json'
+                            ];
+                            // get record id
+                            $getRecID = curl_init();
+                            curl_setopt($getRecID, CURLOPT_URL, 'https://api.cloudflare.com/client/v4/zones/'.Config::get('cloudflare_zoneid').'/dns_records?&name='.$node->server);
+                            curl_setopt($getRecID, CURLOPT_HTTPHEADER, $headers);
+                            curl_setopt($getRecID, CURLOPT_RETURNTRANSFER, true);
+                            $RecID = json_decode(curl_exec($getRecID),true)["result"][0]["id"];
+                            curl_close($getRecID);
+                            // update record
+                            $RecUpdate = curl_init();
+                            curl_setopt($RecUpdate, CURLOPT_URL, 'https://api.cloudflare.com/client/v4/zones/'.Config::get('cloudflare_zoneid').'/dns_records/'.$RecID);
+                            curl_setopt($RecUpdate, CURLOPT_HTTPHEADER, $headers);
+                            curl_setopt($RecUpdate, CURLOPT_RETURNTRANSFER, true);
+                            curl_setopt($RecUpdate, CURLOPT_CUSTOMREQUEST, 'PUT');
+                            $post_data = '{"type":"CNAME","name":"'.$node->server.'","content":"'.$Temp_node->server.'","ttl":'.Config::get('cloudflare_ttl').'}';
+                            curl_setopt($RecUpdate, CURLOPT_POSTFIELDS, $post_data);
+                            $CFResult = json_decode(curl_exec($RecUpdate),true)["success"];
+                            curl_close($RecUpdate);
+                            break;
                     }
+                    $notice_text .= '域名解析被切换到了 '.$Temp_node->name.' 上了喵~';
+                }
 
-                    Telegram::Send($notice_text);
+                Telegram::Send($notice_text);
 
                 $myfile = fopen(BASE_PATH.'/storage/'.$node->id.'.offline', 'w+') or die('Unable to open file!');
                 $txt = '1';
-                    fwrite($myfile, $txt);
-                    fclose($myfile);
-                }
+                fwrite($myfile, $txt);
+                fclose($myfile);
+            }
             // Process node offline end
 
             // Process node recover begin
             if (time()-$node->node_heartbeat<60&&file_exists(BASE_PATH.'/storage/'.$node->id.'.offline')&&$node->node_heartbeat!=0&&($node->sort==0||$node->sort==7||$node->sort==8||$node->sort==10)) {
                 if (Config::get('node_offline_warn') == true){
+                    $adminUser = User::where("is_admin", "=", "1")->get();
                     foreach ($adminUser as $user) {
                         $subject = Config::get('appName').'-系统提示';
                         $to = $user->email;
@@ -642,59 +649,59 @@ class Job
                                 $origin_value = $node->node_ip;
                             }
                     switch(Config::get('node_switcher'))
-                            {
+                    {
                         case 'cloudxns':
-                                    $api=new Api();
+                            $api=new Api();
                             $api->setApiKey(Config::get('cloudxns_apikey'));//修改成自己API KEY
                             $api->setSecretKey(Config::get('cloudxns_apisecret'));//修改成自己的SECERET KEY
 
-                                    $api->setProtocol(true);
+                            $api->setProtocol(true);
 
-                                    $domain_json=json_decode($api->domain->domainList());
+                            $domain_json=json_decode($api->domain->domainList());
 
-                                    foreach ($domain_json->data as $domain) {
-                                        if (strpos($domain->domain, Config::get('cloudxns_domain'))!==false) {
-                                            $domain_id=$domain->id;
-                                        }
-                                    }
-
-                                    $record_json=json_decode($api->record->recordList($domain_id, 0, 0, 2000));
-
-                                    foreach ($record_json->data as $record) {
-                                        if (($record->host.".".Config::get('cloudxns_domain'))==$node->server) {
-                                            $record_id=$record->record_id;
-
-                                            $api->record->recordUpdate($domain_id, $record->host, $origin_value, $origin_type, 55, 600, 1, '', $record_id);
-                                        }
-                                    }
-                        case 'cloudflare':
-                                    // define header
-                                    $headers = [
-                                        'X-Auth-Email: '.Config::get('cloudflare_email'),
-                                        'X-Auth-Key: '.Config::get('cloudflare_key'),
-                                        'Content-type: application/json'
-                                        ];
-                                    // get record id
-                                    $getRecID = curl_init();
-                                    curl_setopt($getRecID, CURLOPT_URL, 'https://api.cloudflare.com/client/v4/zones/'.Config::get('cloudflare_zoneid').'/dns_records?&name='.$node->server);
-                                    curl_setopt($getRecID, CURLOPT_HTTPHEADER, $headers);
-                                    curl_setopt($getRecID, CURLOPT_RETURNTRANSFER, true);
-                                    $RecID = json_decode(curl_exec($getRecID),true)["result"][0]["id"];
-                                    curl_close($getRecID);
-                                    // update record
-                                    $RecUpdate = curl_init();
-                                    curl_setopt($RecUpdate, CURLOPT_URL, 'https://api.cloudflare.com/client/v4/zones/'.Config::get('cloudflare_zoneid').'/dns_records/'.$RecID);
-                                    curl_setopt($RecUpdate, CURLOPT_HTTPHEADER, $headers);
-                                    curl_setopt($RecUpdate, CURLOPT_RETURNTRANSFER, true);
-                                    curl_setopt($RecUpdate, CURLOPT_CUSTOMREQUEST, 'PUT');
-                                    $post_data = '{"type":"'.$origin_type.'","name":"'.$node->server.'","content":"'.$origin_value.'","ttl":'.Config::get('cloudflare_ttl').'}';
-                                    curl_setopt($RecUpdate, CURLOPT_POSTFIELDS, $post_data);
-                                    curl_exec($RecUpdate);
-                                    curl_close($RecUpdate);
+                            foreach ($domain_json->data as $domain) {
+                                if (strpos($domain->domain, Config::get('cloudxns_domain'))!==false) {
+                                    $domain_id=$domain->id;
+                                }
                             }
-                    $notice_text .= '域名解析被切换回来了喵~';
+
+                            $record_json=json_decode($api->record->recordList($domain_id, 0, 0, 2000));
+
+                            foreach ($record_json->data as $record) {
+                                if (($record->host.".".Config::get('cloudxns_domain'))==$node->server) {
+                                    $record_id=$record->record_id;
+
+                                    $api->record->recordUpdate($domain_id, $record->host, $origin_value, $origin_type, 55, 600, 1, '', $record_id);
+                                }
+                            }
+                        case 'cloudflare':
+                            // define header
+                            $headers = [
+                                'X-Auth-Email: '.Config::get('cloudflare_email'),
+                                'X-Auth-Key: '.Config::get('cloudflare_key'),
+                                'Content-type: application/json'
+                            ];
+                            // get record id
+                            $getRecID = curl_init();
+                            curl_setopt($getRecID, CURLOPT_URL, 'https://api.cloudflare.com/client/v4/zones/'.Config::get('cloudflare_zoneid').'/dns_records?&name='.$node->server);
+                            curl_setopt($getRecID, CURLOPT_HTTPHEADER, $headers);
+                            curl_setopt($getRecID, CURLOPT_RETURNTRANSFER, true);
+                            $RecID = json_decode(curl_exec($getRecID),true)["result"][0]["id"];
+                            curl_close($getRecID);
+                            // update record
+                            $RecUpdate = curl_init();
+                            curl_setopt($RecUpdate, CURLOPT_URL, 'https://api.cloudflare.com/client/v4/zones/'.Config::get('cloudflare_zoneid').'/dns_records/'.$RecID);
+                            curl_setopt($RecUpdate, CURLOPT_HTTPHEADER, $headers);
+                            curl_setopt($RecUpdate, CURLOPT_RETURNTRANSFER, true);
+                            curl_setopt($RecUpdate, CURLOPT_CUSTOMREQUEST, 'PUT');
+                            $post_data = '{"type":"'.$origin_type.'","name":"'.$node->server.'","content":"'.$origin_value.'","ttl":'.Config::get('cloudflare_ttl').'}';
+                            curl_setopt($RecUpdate, CURLOPT_POSTFIELDS, $post_data);
+                            curl_exec($RecUpdate);
+                            curl_close($RecUpdate);
                     }
-                    Telegram::Send($notice_text);
+                    $notice_text .= '域名解析被切换回来了喵~';
+                }
+                Telegram::Send($notice_text);
 
                 unlink(BASE_PATH.'/storage/'.$node->id.'.offline');
             }
@@ -904,7 +911,7 @@ class Job
         // Radius ban begin
         $rbusers = RadiusBan::all();
         foreach ($rbusers as $sinuser) {
-            $user = User::where('id',$sinuser->userid);
+            $user = User::where('id',$sinuser->userid)->first();
 
             if ($user == null) {
                 $sinuser->delete();
