@@ -83,11 +83,11 @@
 
                                     <div class="form-group form-group-label">
                                         <label for="mu_only">
-                                            <label class="floating-label" for="sort">单端口多用户启用</label>
+                                            <label class="floating-label" for="sort">公共端口启用</label>
                                             <select id="mu_only" class="form-control" name="is_multi_user">
-                                                <option value="0" {if $node->mu_only==0}selected{/if}>单端口多用户与普通端口并存</option>
+                                                <option value="0" {if $node->mu_only==0}selected{/if}>公共端口与普通端口并存</option>
                                                 <option value="-1" {if $node->mu_only==-1}selected{/if}>只启用普通端口</option>
-                                                <option value="1" {if $node->mu_only==1}selected{/if}>只启用单端口多用户</option>
+                                                <option value="1" {if $node->mu_only==1}selected{/if}>只启用公共端口</option>
                                             </select>
                                         </label>
                                     </div>
@@ -126,7 +126,7 @@
                                                     <option value="6" {if $node->sort==6}selected{/if}>APN</option>
                                                     <option value="7" {if $node->sort==7}selected{/if}>PAC PLUS(Socks 代理生成 PAC文件)</option>
                                                     <option value="8" {if $node->sort==8}selected{/if}>PAC PLUS PLUS(HTTPS 代理生成 PAC文件)</option>
-                                                    <option value="9" {if $node->sort==9}selected{/if}>Shadowsocks 单端口多用户</option>
+                                                    <option value="9" {if $node->sort==9}selected{/if}>Shadowsocks 公共端口</option>
                                                     <option value="10" {if $node->sort==10}selected{/if}>Shadowsocks 中转</option>
                                                 </select>
                                             </div>

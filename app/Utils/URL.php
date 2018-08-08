@@ -357,7 +357,7 @@ class URL
 
             $user = $mu_user;
 
-            $node_name .= " - ".$mu_port." 端口单端口多用户";
+            $node_name .= " - ".$mu_port." 公共端口";
         }
 
         if($is_ss) {
@@ -383,7 +383,7 @@ class URL
         $return_array['obfs_param'] = $user->obfs_param;
         $return_array['group'] = Config::get('appName');
         if($mu_port != 0) {
-            $return_array['group'] .= ' - 单端口多用户';
+            $return_array['group'] .= ' - 公共端口';
         }
         return $return_array;
     }

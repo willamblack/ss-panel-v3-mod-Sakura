@@ -63,11 +63,11 @@
 
                                 <div class="form-group form-group-label">
                                     <label for="is_multi_user">
-                                        <label class="floating-label" for="sort">单端口多用户承载端口</label>
+                                        <label class="floating-label" for="sort">公共端口</label>
                                         <select id="is_multi_user" class="form-control" name="is_multi_user">
-                                            <option value="0" {if $edit_user->is_multi_user==0}selected{/if}>非单端口多用户承载端口</option>
-                                            <option value="1" {if $edit_user->is_multi_user==1}selected{/if}>混淆式单端口多用户承载端口</option>
-                                            <option value="2" {if $edit_user->is_multi_user==2}selected{/if}>协议式单端口多用户承载端口</option>
+                                            <option value="0" {if $edit_user->is_multi_user==0}selected{/if}>非公共端口</option>
+                                            <option value="1" {if $edit_user->is_multi_user==1}selected{/if}>混淆式公共端口</option>
+                                            <option value="2" {if $edit_user->is_multi_user==2}selected{/if}>协议式公共端口</option>
                                         </select>
                                     </label>
                                 </div>

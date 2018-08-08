@@ -24,7 +24,7 @@ class NodeController extends AdminController
                             "node_bandwidth" => "已走流量/GB", "node_bandwidth_limit" => "流量限制/GB",
                             "bandwidthlimit_resetday" => "流量重置日", "node_heartbeat" => "上一次活跃时间",
                             "custom_method" => "自定义加密", "custom_rss" => "自定义协议以及混淆",
-                            "mu_only" => "只启用单端口多用户");
+                            "mu_only" => "只启用公共端口");
         $table_config['default_show_column'] = Array("op", "id", "name", "sort");
         $table_config['ajax_url'] = 'node/ajax';
 
@@ -200,7 +200,7 @@ class NodeController extends AdminController
                               "node_bandwidth" => "已走流量/GB", "node_bandwidth_limit" => "流量限制/GB",
                               "bandwidthlimit_resetday" => "流量重置日", "node_heartbeat" => "上一次活跃时间",
                               "custom_method" => "自定义加密", "custom_rss" => "自定义协议以及混淆",
-                              "mu_only" => "只启用单端口多用户");
+                              "mu_only" => "只启用公共端口");
         $key_str = '';
         foreach($total_column as $single_key => $single_value) {
             if($single_key == 'op') {
@@ -256,7 +256,7 @@ class NodeController extends AdminController
                     $sort = 'PAC PLUS PLUS(HTTPS 代理生成 PAC文件)';
                     break;
                 case 9:
-                    $sort = 'Shadowsocks - 单端口多用户';
+                    $sort = 'Shadowsocks - 公共端口';
                     break;
                 case 10:
                     $sort = 'Shadowsocks - 中转';

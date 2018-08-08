@@ -62,7 +62,7 @@
                                                     混淆参数：{$ssr_item['obfs_param']}<br></p>
                                                 {else}
                                                     <p>您好，您目前的 加密方式，混淆，或者协议设置在 ShadowsocksR 客户端下无法连接。请您选用 Shadowsocks 客户端来连接，或者到 资料编辑 页面修改后再来查看此处。</p>
-                                                    <p>同时, ShadowsocksR 单端口多用户的连接不受您设置的影响,您可以在此使用相应的客户端进行连接~</p>
+                                                    <p>同时, ShadowsocksR 公共端口的连接不受您设置的影响,您可以在此使用相应的客户端进行连接~</p>
                                                 {/if}
                                             </div>
                                             <div class="tab-pane fade {if !$ssr_prefer}active in{/if}" id="ss_info">

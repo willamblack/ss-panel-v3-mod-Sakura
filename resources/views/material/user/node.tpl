@@ -151,7 +151,7 @@
                                                                                 <div class="card-main">
                                                                                     <div class="card-inner">
                                                                                     <p class="card-heading" >
-                                                                                        <a href="javascript:void(0);" onClick="urlChange('{$node->id}',{$single_muport['server']->server},{if $relay_rule != null}{$relay_rule->id}{else}0{/if})">{$prefix} {if $relay_rule != null} - {$relay_rule->dist_node()->name}{/if} - 单端口多用户 Shadowsocks - {$single_muport['server']->server} 端口</a>
+                                                                                        <a href="javascript:void(0);" onClick="urlChange('{$node->id}',{$single_muport['server']->server},{if $relay_rule != null}{$relay_rule->id}{else}0{/if})">{$prefix} {if $relay_rule != null} - {$relay_rule->dist_node()->name}{/if} - 公共端口 Shadowsocks - {$single_muport['server']->server} 端口</a>
                                                                                         <span class="label label-brand-accent">{$node->status}</span>
                                                                                     </p>
 
