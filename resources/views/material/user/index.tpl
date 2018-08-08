@@ -100,46 +100,61 @@
                                                         {else}
                                                             <p>您好，您目前的 加密方式，混淆，或者协议设置在 ShadowsocksR 客户端下无法连接。请您选用 Shadowsocks 客户端来连接，或者到 资料编辑 页面修改后再来查看此处。</p>
 
-                                                            <p>同时, ShadowsocksR 公共端口的连接不受您设置的影响,您可以在此使用相应的客户端进行连接~</p>
+                                                            <p>同时, ShadowsocksR 单端口多用户的连接不受您设置的影响,您可以在此使用相应的客户端进行连接~</p>
 
                                                             <p>请注意，在当前状态下您的 SSR 订阅链接已经失效，您无法通过此种方式导入节点。</p>
                                                         {/if}
                                                     </div>
                                                     <div class="tab-pane fade" id="all_ssr_windows">
-                                                        <p><a href="/download/ShadowsocksR-Windows.zip">下载</a>，解压，运行程序，然后您有三种方式导入所有节点<br>
-                                                            (1)下载<a href="/user/getpcconf?is_mu=0&is_ss=0">这个（普通端口）</a>或者<a href="/user/getpcconf?is_mu=1&is_ss=0">这个（公共端口）</a>，右键小飞机 服务器 -- 从配置文件导入服务器，选择这个文件，<br>
-                                                            (2)点击<a class="copy-text" data-clipboard-text="{$ssr_url_all}">这里（普通端口）</a>或者<a class="copy-text" data-clipboard-text="{$ssr_url_all}">这个(公共端口）</a>，然后右键小飞机 -- 从剪贴板复制地址<br>
-                                                            (3)(推荐)右键小飞机--服务器--SSR服务器订阅设置，将订阅地址设置为下面的地址，其他参数留空，确定之后再更新 SSR 服务器订阅。<br>
-                                                            然后选择一个合适的服务器，系统代理模式选”全局模式”，代理规则选“绕过局域网和大陆”，然后即可上网。</p>
-
-                                                        <p>SSR 订阅地址：<br>
-                                                            普通端口地址：<code>{$baseUrl}/link/{$ssr_sub_token}?mu=0</code><br>
-                                                            公共端口端口地址：<code>{$baseUrl}/link/{$ssr_sub_token}?mu=1</code>
-                                                        </p>
+                                                        <p><span class="icon icon-lg">filter_1</span>下载<a href="/download/ShadowsocksR-Windows.zip">这个</a>。</p>
+                                                        <p><span class="icon icon-lg">filter_2</span>解压至任意目录并运行</p>
+                                                        <p><span class="icon icon-lg">filter_3</span>任务栏右下角右键纸飞机图标->服务器订阅->SSR服务器订阅设置，将订阅链接设置为下面的地址，确定之后再更新SSR服务器订阅(绕过代理)。</p>
+                                                        <p><span class="icon icon-lg">filter_4</span>然后选择一个合适的服务器，代理规则选"绕过局域网和大陆"(视情况而定)，然后即可开始上网。</p>
+                                                        <p><span class="icon icon-lg">filter_5</span>备用方法：点击<a class="copy-text" data-clipboard-text="">这里(普通端口)</a>或者<a class="copy-text" data-clipboard-text="">这里(单端口多用户)</a>，然后右键小飞机->从剪贴板复制地址</p>
+                                                        {$subscribe}
+                                                        {$subscribe_mu}
                                                     </div>
                                                     <div class="tab-pane fade" id="all_ssr_mac">
-                                                        <p><a href="/download/ShadowsocksX-NG-R.dmg">下载</a>，安装，然后下载<a href="/user/getpcconf?is_mu=0&is_ss=0">这个(普通端口)</a>或者<a  href="/user/getpcconf?is_mu=1&is_ss=0">这个（公共端口）</a>，运行程序，小飞机上右键 服务器列表 子菜单 的 “导入服务器配置文件...” 导入这个文件，然后选择一个合适的服务器，更新一下PAC，然后开启系统代理即可上网。</p>
+                                                        <p><span class="icon icon-lg">filter_1</span>下载<a href="/download/ShadowsocksX-NG-R.dmg">这个</a>。</p>
+                                                        <p><span class="icon icon-lg">filter_2</span>打开下载的 dmg 文件。</p>
+                                                        <p><span class="icon icon-lg">filter_3</span>将 ShadowsocksX 拖入到 Finder 的应用程序列表(Applications)。</p>
+                                                        <p><span class="icon icon-lg">filter_4</span>打开 Launchapad 里的 ShadowsocksX。</p>
+                                                        <p><span class="icon icon-lg">filter_5</span>菜单栏的纸飞机图标-服务器-服务器订阅填入以下地址并更新。</p>
+                                                        {$subscribe}
+                                                        {$subscribe_mu}
                                                     </div>
                                                     <div class="tab-pane fade" id="all_ssr_ios">
-                                                        <p>推荐下载<a href="https://itunes.apple.com/cn/app/shadowrocket/id932747118?mt=8">Shadowrocket</a>，然后在 Safari 中点击<a href="{$ssr_url_all}">这个（普通端口）</a>或者<a href="{$ssr_url_all_mu}">这个（公共端口）</a>，然后点击确定，就可以批量添加节点。</p>
-                                                        <p>SSR 订阅地址：<br>
-                                                            普通端口地址：<code>{$baseUrl}/link/{$ssr_sub_token}?mu=0</code><br>
-                                                            公共端口端口地址：<code>{$baseUrl}/link/{$ssr_sub_token}?mu=1</code>
-                                                        </p>
+                                                        <p><span class="icon icon-lg">filter_1</span>安装 Shadowrocket。</p>
+                                                        <p><span class="icon icon-lg">filter_2</span>打开 Shadowrocket，点击右上角添加符号，添加类型为<code>Subscribe</code>，URL 填写以下地址即可自动更新节点</p>
+                                                        <p><span class="icon icon-lg">filter_3</span>备用方法：在 Safari 中点击<a href="{$ssr_url_all}">这里(普通端口)</a>或者<a href="{$ssr_url_all_mu}">这里(公共端口)</a>。</p>
+                                                        {$subscribe}
+                                                        {$subscribe_mu}
                                                     </div>
                                                     <div class="tab-pane fade" id="all_ssr_android">
-                                                        <p><a href="/download/ShadowsocksR-Android.apk">下载</a>，安装，然后在手机上默认浏览器中点击<a href="{$ssr_url_all}">这个链接（普通端口）</a>或者<a href="{$ssr_url_all_mu}">这个链接（公共端口）</a>，然后点击确定，批量添加完节点，然后路由选择绕过大陆，右上角开启就可以上网了。同时提供一个 ACL 地址，<a href="/link/{$acl_token}">长按复制地址</a>到客户端里应用即可。</p>
-                                                        <p>SSR 订阅地址，您可以在节点列表处添加订阅来自动更新节点：<br>
-                                                            普通端口地址：<code>{$baseUrl}/link/{$ssr_sub_token}?mu=0</code><br>
-                                                            公共端口端口地址：<code>{$baseUrl}/link/{$ssr_sub_token}?mu=1</code>
-                                                        </p>
+                                                        <p><span class="icon icon-lg">filter_1</span>下载<a href="/download/ShadowsocksR-Android.apk">这个</a>并安装。</p>
+                                                        <p><span class="icon icon-lg">filter_2</span>打开应用，点击左上角的<code>ShdowsocksR</code>字样，此后点击右下角的添加符号</p>
+                                                        <p><span class="icon icon-lg">filter_3</span>选择<code>添加/升级 SSR 订阅</code>。</p>
+                                                        <p><span class="icon icon-lg">filter_4</span>添加订阅地址，输入以下地址后确定。</p>
+                                                        <p><span class="icon icon-lg">filter_5</span>请滑动删除自带的<code>FreeSRR-public</code>订阅/</p>
+                                                        <p><span class="icon icon-lg">filter_6</span>点击<code>确定并升级</code>。</p>
+                                                        <p><span class="icon icon-lg">filter_7</span>选择节点，并修改路由为<code>绕过局域网及中国大陆地址</code>。</p>
+                                                        <p><span class="icon icon-lg">filter_8</span>点击右上角的纸飞机图标连接。</p>
+                                                        <p><span class="icon icon-lg">filter_9</span>备用方法：在手机上浏览器(推荐使用 Chrome)中点击<a href="{$ssr_url_all}">这个链接(普通端口)</a>或者<a href="{$ssr_url_all_mu}">这个链接(公共端口)</a>。</p>
+                                                        <p>ACL 地址：<a href="/link/{$acl_token}">长按复制此地址</a>。(如果你不知道这是什么，请不要使用)</p>
+                                                        {$subscribe}
+                                                        {$subscribe_mu}
                                                     </div>
                                                     <div class="tab-pane fade" id="all_ssr_router">
-                                                        <p>路由器 刷入<a href="http://www.right.com.cn/forum/thread-161324-1-1.html">这个固件</a>，然后 SSH 登陆路由器，执行以下命令（导入普通端口）<br>
-                                                        <code>wget -O- {$baseUrl}/link/{$router_token}?is_ss=0 | bash && echo -e "\n0 */3 * * * wget -O- {$baseUrl}/link/{$router_token}?is_ss=0 | bash\n">> /etc/storage/cron/crontabs/admin && killall crond && crond </code><br>
-                                                        或者这个公共端口的<br>
-                                                        <code>wget -O- {$baseUrl}/link/{$router_token_without_mu}?is_ss=0 | bash && echo -e "\n0 */3 * * * wget -O- {$baseUrl}/link/{$router_token_without_mu}?is_ss=0 | bash\n">> /etc/storage/cron/crontabs/admin && killall crond && crond </code><br>
-                                                        执行完毕以后就可以到路由器的设置面板里随意选择 Shadowsocks 服务器进行连接了。</p>
+                                                        <p><span class="icon icon-lg">filter_1</span>在路由器上路由器刷入<a href="http://www.right.com.cn/forum/thread-161324-1-1.html">这个</a>固件。</p>
+                                                        <p><span class="icon icon-lg">filter_2</span>使用 SSH 登录路由器。</p>
+                                                        <p><span class="icon icon-lg">filter_3</span>执行下面的命令。</p>
+                                                        <p>普通端口:
+                                                            <code>wget -O- {$baseUrl}/link/{$router_token}?is_ss=0 | bash && echo -e "\n0 */3 * * * wget -O- {$baseUrl}/link/{$router_token}?is_ss=0 | bash\n">> /etc/storage/cron/crontabs/admin && killall crond && crond </code>
+                                                        </p>
+                                                        <p>公共端口：
+                                                            <code>wget -O- {$baseUrl}/link/{$router_token_without_mu}?is_ss=0 | bash && echo -e "\n0 */3 * * * wget -O- {$baseUrl}/link/{$router_token_without_mu}?is_ss=0 | bash\n">> /etc/storage/cron/crontabs/admin && killall crond && crond </code>
+                                                        </p>
+                                                        <p><span class="icon icon-lg">filter_4</span>之后你就可以到路由器的面板中选择 Shadowsocks 服务器进行连接了。</p>
                                                     </div>
 
                                                 </div>
@@ -191,30 +206,42 @@
                                                         </dl>
                                                         {else}
                                                             <p>您好，您目前的 加密方式，混淆，或者协议设置在 SS 客户端下无法连接。请您选用 SSR 客户端来连接，或者到 资料编辑 页面修改后再来查看此处。</p>
-                                                            <p>同时, Shadowsocks 公共端口的连接不受您设置的影响,您可以在此使用相应的客户端进行连接~</p>
+                                                            <p>同时, Shadowsocks 单端口多用户的连接不受您设置的影响,您可以在此使用相应的客户端进行连接~</p>
                                                         {/if}
                                                     </div>
                                                     <div class="tab-pane fade" id="all_ss_windows">
-                                                        <p><a href="/download/Shadowsocks-Windows.zip">下载</a>，解压，运行程序，然后您有两种方式导入所有节点<br>
-                                                            (1)下载<a href="/user/getpcconf?is_mu=0&is_ss=1">这个（普通端口）</a>，放到小飞机的目录下，然后打开小飞机。<br>
-                                                            (2)点击<a class="copy-text" data-clipboard-text="{$ss_url_all_win}">这里（普通端口）</a>, 然后右键小飞机 -- 从剪贴板导入 URL<br>
+                                                        <p><span class="icon icon-lg">filter_1</span>下载<a href="/download/Shadowsocks-Windows.zip">这个</a>。</p>
+                                                        <p><span class="icon icon-lg">filter_2</span>解压至任意目录并运行</p>
+                                                        <p><span class="icon icon-lg">filter_3</span>点击<a class="copy-text" data-clipboard-text="{$ss_url_all_win}">这里</a>, 然后右键 Shadowsocks 的图标->从剪贴板导入 URL。</p>
+                                                        <p><span class="icon icon-lg">filter_4</span>备用方法：下载<a href="/user/getpcconf?is_mu=0&is_ss=1">这个(普通端口)</a>，放到 Shadowsocks 的目录下，然后打开 Shadowsocks。</p>
                                                     </div>
                                                     <div class="tab-pane fade" id="all_ss_mac">
-                                                        <p><a href="/download/ShadowsocksX-NG.zip">下载</a>，安装，然后下载<a href="/user/getpcconf?is_mu=0&is_ss=1">这个（普通端口）</a>或者<a href="/user/getpcconf?is_mu=1&is_ss=1">这个（公共端口）</a>，运行程序，小飞机上右键 服务器列表 子菜单 的 “导入服务器配置文件...” 导入这个文件，然后选择一个合适的服务器，更新一下PAC，然后开启系统代理即可上网。</p>
+                                                        <p><span class="icon icon-lg">filter_1</span>下载<a href="/download/ShadowsocksX-NG.zip">这个</a>并安装。</p>
+                                                        <p><span class="icon icon-lg">filter_2</span>下载<a href="/user/getpcconf?is_mu=0&is_ss=1">这个(普通端口)</a>或者<a href="/user/getpcconf?is_mu=1&is_ss=1">这个(单端口多用户)</a>。</p>
+                                                        <p><span class="icon icon-lg">filter_3</span>启动程序，右键纸飞机图标，选择<code>服务器列表->导入服务器配置文件...</code>，选择下载的文件导入。</p>
+                                                        <p><span class="icon icon-lg">filter_4</span>选择服务器，更新 PAC，开启系统代理</p>
                                                     </div>
                                                     <div class="tab-pane fade" id="all_ss_ios">
-                                                        <p>推荐下载<a href="https://itunes.apple.com/cn/app/shadowrocket/id932747118?mt=8">Shadowrocket</a>，然后在 Safari 中点击<a href="{$ss_url_all}">这个（普通端口）</a>或者<a href="{$ss_url_all_mu}">这个（公共端口）</a>，然后点击确定，就可以批量添加节点。</p>
-                                                        <p>iOS 下载<a href="/link/{$ios_token}?is_ss=1">这个（普通端口）</a>或者<a href="/link/{$ios_token}?is_ss=1&is_mu=1">这个（公共端口）</a>，导入到 Surge 中，然后就可以随意切换服务器上网了。</p>
+                                                        <p><span class="icon icon-lg">filter_1</span>安装 Shadowrocket。</p>
+                                                        <p><span class="icon icon-lg">filter_2</span>在 Safari 中点击<a href="{$ss_url_all}">这个(普通端口)</a>或者<a href="{$ss_url_all_mu}">这个(公共端口)</a>以批量添加节点</p>
                                                     </div>
                                                     <div class="tab-pane fade" id="all_ss_android">
-                                                        <p><a href="/download/Shadowsocks-Android.apk">下载</a>，再<a href="/download/Shadowsocks-Obfs-Android.apk">下载</a>，然后安装，然后在手机上点击<a class="copy-text" data-clipboard-text="{$ss_url_all}">这个链接（普通端口）</a>或者<a class="copy-text" data-clipboard-text="{$ss_url_all_mu}">这个链接（公共端口端口）</a>复制到剪贴板，打开 Shadowsocks 客户端，选择从剪贴板导入，然后选择一个节点，设置一下路由为绕过大陆，点击飞机就可以上网了。</p>
+                                                        <p><span class="icon icon-lg">filter_1</span>下载安装 <a href="/download/Shadowsocks-Android.apk">Shadowsocks</a> 和 <a href="/download/Shadowsocks-Obfs-Android.apk">Shadowsocks-Obfs</a>。</p>
+                                                        <p><span class="icon icon-lg">filter_2</span>点击<a class="copy-text" data-clipboard-text="{$ss_url_all}">这里(普通端口)</a>或者<a class="copy-text" data-clipboard-text="{$ss_url_all_mu}">这里(公共端口)</a>。</p>
+                                                        <p><span class="icon icon-lg">filter_3</span>打开 Shadowsocks，点击右上角的添加符号，选择"从粘贴板导入"。</p>
+                                                        <p><span class="icon icon-lg">filter_4</span>修改节点的路由为"绕过局域网与中国大陆地址"(视情况而定)，点击纸飞机图标开始连接。</p>
                                                     </div>
                                                     <div class="tab-pane fade" id="all_ss_router">
-                                                        <p>路由器 刷入<a href="http://www.right.com.cn/forum/thread-161324-1-1.html">这个固件</a>，然后 SSH 登陆路由器，执行以下命令（导入普通端口）<br>
-                                                        <code>wget -O- {$baseUrl}/link/{$router_token}?is_ss=1 | bash && echo -e "\n0 */3 * * * wget -O- {$baseUrl}/link/{$router_token}?is_ss=1 | bash\n">> /etc/storage/cron/crontabs/admin && killall crond && crond </code><br>
-                                                        或者这个公共端口的<br>
-                                                        <code>wget -O- {$baseUrl}/link/{$router_token_without_mu}?is_ss=1 | bash && echo -e "\n0 */3 * * * wget -O- {$baseUrl}/link/{$router_token_without_mu}?is_ss=1 | bash\n">> /etc/storage/cron/crontabs/admin && killall crond && crond </code><br>
-                                                        执行完毕以后就可以到路由器的设置面板里随意选择 Shadowsocks 服务器进行连接了。</p>
+                                                        <p><span class="icon icon-lg">filter_1</span>在路由器上路由器刷入<a href="http://www.right.com.cn/forum/thread-161324-1-1.html">这个</a>固件。</p>
+                                                        <p><span class="icon icon-lg">filter_2</span>使用 SSH 登录路由器。</p>
+                                                        <p><span class="icon icon-lg">filter_3</span>执行下面的命令。</p>
+                                                        <p>普通端口:
+                                                            <code>wget -O- {$baseUrl}/link/{$router_token}?is_ss=0 | bash && echo -e "\n0 */3 * * * wget -O- {$baseUrl}/link/{$router_token}?is_ss=0 | bash\n">> /etc/storage/cron/crontabs/admin && killall crond && crond </code>
+                                                        </p>
+                                                        <p>公共端口:
+                                                            <code>wget -O- {$baseUrl}/link/{$router_token_without_mu}?is_ss=0 | bash && echo -e "\n0 */3 * * * wget -O- {$baseUrl}/link/{$router_token_without_mu}?is_ss=0 | bash\n">> /etc/storage/cron/crontabs/admin && killall crond && crond </code>
+                                                        </p>
+                                                        <p><span class="icon icon-lg">filter_4</span>之后你就可以到路由器的面板中选择 Shadowsocks 服务器进行连接了。</p>
                                                     </div>
                                                 </div>
                                             </div>

@@ -79,12 +79,33 @@ class UserController extends BaseController
 
         $Ann = Ann::orderBy('date', 'desc')->first();
 
+        $baseURL = Config::get('baseUrl');
+        $subscribe = '<p>
+                                                            <span class="icon icon-lg">flash_auto</span> 普通端口订阅地址：
+                                                            <input type="text" class="input form-control form-control-monospace" name="input1" readonly value="'.$baseURL.'/link/'.$ssr_sub_token.'?mu=0" readonly="true">
+                                                            <button class="copy-text btn btn-brand-accent" type="button" data-clipboard-text="'.$baseURL.'/link/'.$ssr_sub_token.'?mu=0">点击复制地址</button>
+                                                        </p>';
+        $subscribe_mu = '<p>
+                                                            <span class="icon icon-lg">flash_auto</span> 公共端口订阅地址：
+                                                            <input type="text" class="input form-control form-control-monospace" name="input1" readonly value="'.$baseURL.'/link/'.$ssr_sub_token.'?mu=1" readonly="true">
+                                                            <button class="copy-text btn btn-brand-accent" type="button" data-clipboard-text="'.$baseURL.'/link/'.$ssr_sub_token.'?mu=1">点击复制地址</button>
+                                                        </p>';
 
-        return $this->view()->assign("ssr_sub_token", $ssr_sub_token)->assign("router_token", $router_token)
-                ->assign("router_token_without_mu", $router_token_without_mu)->assign("acl_token", $acl_token)
-                ->assign('ann', $Ann)->assign('geetest_html', $GtSdk)->assign("ios_token", $ios_token)
-                ->assign('enable_duoshuo', Config::get('enable_duoshuo'))->assign('duoshuo_shortname', Config::get('duoshuo_shortname'))
-                ->assign("user", $this->user)->registerClass("URL", "App\Utils\URL")->assign('baseUrl', Config::get('baseUrl'))->display('user/index.tpl');
+
+        return $this->view()->assign("ssr_sub_token", $ssr_sub_token)
+            ->assign("router_token", $router_token)
+            ->assign("router_token_without_mu", $router_token_without_mu)
+            ->assign("acl_token", $acl_token)
+            ->assign('ann', $Ann)
+            ->assign('geetest_html', $GtSdk)
+            ->assign("ios_token", $ios_token)
+            ->assign('enable_duoshuo', Config::get('enable_duoshuo'))
+            ->assign('duoshuo_shortname', Config::get('duoshuo_shortname'))
+            ->assign("user", $this->user)->registerClass("URL", "App\Utils\URL")
+            ->assign('baseUrl', $baseURL)
+            ->assign('subscribe', $subscribe)
+            ->assign('subscribe_mu', $subscribe_mu)
+            ->display('user/index.tpl');
     }
 
 
