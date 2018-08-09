@@ -528,7 +528,7 @@ class Job
 
             // Process node offline start
             if ($node->isNodeOnline() === false && time() - $node->node_heartbeat <= 360) {
-                if (Config::get('node_offline_warn') == true){
+                if (Config::get('node_offline_warn') == 'true'){
                     $adminUser = User::where("is_admin", "=", "1")->get();
                     foreach ($adminUser as $user) {
                         $subject = Config::get('appName').'-系统警告';
@@ -545,7 +545,7 @@ class Job
                     }
                 }
                 $notice_text = '喵喵喵~ '.$node->name.' 节点掉线了喵~';
-                if (($node->sort==0 || $node->sort==10) && Config::get('node_switcher') != none){
+                if (($node->sort==0 || $node->sort==10) && Config::get('node_switcher') != 'none'){
                     $Temp_node = Node::where('node_class', '<=', $node->node_class)->where(
                         function ($query) use ($node) {
                         $query->where('node_group', '=', $node->node_group)
