@@ -100,7 +100,7 @@
                                                         {else}
                                                             <p>您好，您目前的 加密方式，混淆，或者协议设置在 ShadowsocksR 客户端下无法连接。请您选用 Shadowsocks 客户端来连接，或者到 资料编辑 页面修改后再来查看此处。</p>
 
-                                                            <p>同时, ShadowsocksR 单端口多用户的连接不受您设置的影响,您可以在此使用相应的客户端进行连接~</p>
+                                                            <p>同时, ShadowsocksR 公共端口的连接不受您设置的影响,您可以在此使用相应的客户端进行连接~</p>
 
                                                             <p>请注意，在当前状态下您的 SSR 订阅链接已经失效，您无法通过此种方式导入节点。</p>
                                                         {/if}
@@ -110,7 +110,7 @@
                                                         <p><span class="icon icon-lg">filter_2</span>解压至任意目录并运行</p>
                                                         <p><span class="icon icon-lg">filter_3</span>任务栏右下角右键纸飞机图标->服务器订阅->SSR服务器订阅设置，将订阅链接设置为下面的地址，确定之后再更新SSR服务器订阅(绕过代理)。</p>
                                                         <p><span class="icon icon-lg">filter_4</span>然后选择一个合适的服务器，代理规则选"绕过局域网和大陆"(视情况而定)，然后即可开始上网。</p>
-                                                        <p><span class="icon icon-lg">filter_5</span>备用方法：点击<a class="copy-text" data-clipboard-text="">这里(普通端口)</a>或者<a class="copy-text" data-clipboard-text="">这里(单端口多用户)</a>，然后右键小飞机->从剪贴板复制地址</p>
+                                                        <p><span class="icon icon-lg">filter_5</span>备用方法：点击<a class="copy-text" data-clipboard-text="{$ssr_url_all}">这里(普通端口)</a>或者<a class="copy-text" data-clipboard-text="{$ssr_url_all_mu}">这里(公共端口)</a>，然后右键小飞机->从剪贴板复制地址</p>
                                                         {$subscribe}
                                                         {$subscribe_mu}
                                                     </div>
@@ -206,7 +206,7 @@
                                                         </dl>
                                                         {else}
                                                             <p>您好，您目前的 加密方式，混淆，或者协议设置在 SS 客户端下无法连接。请您选用 SSR 客户端来连接，或者到 资料编辑 页面修改后再来查看此处。</p>
-                                                            <p>同时, Shadowsocks 单端口多用户的连接不受您设置的影响,您可以在此使用相应的客户端进行连接~</p>
+                                                            <p>同时, Shadowsocks 公共端口多用户的连接不受您设置的影响,您可以在此使用相应的客户端进行连接~</p>
                                                         {/if}
                                                     </div>
                                                     <div class="tab-pane fade" id="all_ss_windows">
@@ -217,7 +217,7 @@
                                                     </div>
                                                     <div class="tab-pane fade" id="all_ss_mac">
                                                         <p><span class="icon icon-lg">filter_1</span>下载<a href="/download/ShadowsocksX-NG.zip">这个</a>并安装。</p>
-                                                        <p><span class="icon icon-lg">filter_2</span>下载<a href="/user/getpcconf?is_mu=0&is_ss=1">这个(普通端口)</a>或者<a href="/user/getpcconf?is_mu=1&is_ss=1">这个(单端口多用户)</a>。</p>
+                                                        <p><span class="icon icon-lg">filter_2</span>下载<a href="/user/getpcconf?is_mu=0&is_ss=1">这个(普通端口)</a>或者<a href="/user/getpcconf?is_mu=1&is_ss=1">这个(公共端口)</a>。</p>
                                                         <p><span class="icon icon-lg">filter_3</span>启动程序，右键纸飞机图标，选择<code>服务器列表->导入服务器配置文件...</code>，选择下载的文件导入。</p>
                                                         <p><span class="icon icon-lg">filter_4</span>选择服务器，更新 PAC，开启系统代理</p>
                                                     </div>
