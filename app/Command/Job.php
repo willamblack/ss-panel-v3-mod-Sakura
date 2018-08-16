@@ -518,7 +518,7 @@ class Job
                         $relay_rules = Relay::where('dist_node_id',$node->id)->get();
                         foreach ($relay_rules as $relay_rule){
                             $relay_rule->dist_ip = $ip;
-                            $relay->save();
+                            $relay_rule->save();
                         }
                     }
                 }
