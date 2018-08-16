@@ -514,12 +514,11 @@ class Job
                         // process ss_node table
                         $node->node_ip=$ip;
                         $node->save();
-                        if ($node->sort == 10){
-                            $relay_rules = Relay::where('dist_node_id',$node->id)->get();
-                            foreach ($relay_rules as $relay_rule){
-                                $relay_rule->dist_ip = $ip;
-                                $relay->save();
-                            }
+                        // process relay table
+                        $relay_rules = Relay::where('dist_node_id',$node->id)->get();
+                        foreach ($relay_rules as $relay_rule){
+                            $relay_rule->dist_ip = $ip;
+                            $relay->save();
                         }
                     }
                 }
