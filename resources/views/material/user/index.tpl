@@ -224,6 +224,7 @@
                                                     <div class="tab-pane fade" id="all_ss_ios">
                                                         <p><span class="icon icon-lg">filter_1</span>安装 Shadowrocket。</p>
                                                         <p><span class="icon icon-lg">filter_2</span>在 Safari 中点击<a href="{$ss_url_all}">这个(普通端口)</a>或者<a href="{$ss_url_all_mu}">这个(公共端口)</a>以批量添加节点</p>
+                                                        <p><span class="icon icon-lg">filter_3</span>备用方法：下载<a href="/link/{$ios_token}?is_ss=1">这个(普通端口)</a>或者<a href="/link/{$ios_token}?is_ss=1&is_mu=1">这个(公共端口)</a>，导入到 Surge 中。</p>
                                                     </div>
                                                     <div class="tab-pane fade" id="all_ss_android">
                                                         <p><span class="icon icon-lg">filter_1</span>下载安装 <a href="/download/Shadowsocks-Android.apk">Shadowsocks</a> 和 <a href="/download/Shadowsocks-Obfs-Android.apk">Shadowsocks-Obfs</a>。</p>
