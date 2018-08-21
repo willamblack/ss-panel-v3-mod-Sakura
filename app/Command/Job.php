@@ -525,8 +525,16 @@ class Job
             }
             // Sync node end
 
+            // Process new node
+            if ($node->online_status == 0 && time() - $node->node_heartbeat <= 90 && ($node->sort == 0 || $node->sort == 10)){
+                $node->online_status = 1;
+                $node->save();
+            }
+
             // Process node offline start
-            if ($node->isNodeOnline() === false && time() - $node->node_heartbeat <= 360) {
+            if ($node->isNodeOnline() == true && time() - $node->node_heartbeat > 90) {
+                $node->online_status = -1;
+                $node->save();
                 if (Config::get('node_offline_warn') == 'true'){
                     $adminUser = User::where("is_admin", "=", "1")->get();
                     foreach ($adminUser as $user) {
@@ -612,16 +620,13 @@ class Job
                 }
 
                 Telegram::Send($notice_text);
-
-                $myfile = fopen(BASE_PATH.'/storage/'.$node->id.'.offline', 'w+') or die('Unable to open file!');
-                $txt = '1';
-                fwrite($myfile, $txt);
-                fclose($myfile);
             }
             // Process node offline end
 
             // Process node recover begin
-            if (time()-$node->node_heartbeat<60&&file_exists(BASE_PATH.'/storage/'.$node->id.'.offline')&&$node->node_heartbeat!=0&&($node->sort==0||$node->sort==7||$node->sort==8||$node->sort==10)) {
+            if ($node->isNodeOnline() == false && time() - $node->node_heartbeat < 60) {
+                $node->online_status = 1;
+                $node->save();
                 if (Config::get('node_offline_warn') == true){
                     $adminUser = User::where("is_admin", "=", "1")->get();
                     foreach ($adminUser as $user) {
@@ -701,8 +706,6 @@ class Job
                     $notice_text .= '域名解析被切换回来了喵~';
                 }
                 Telegram::Send($notice_text);
-
-                unlink(BASE_PATH.'/storage/'.$node->id.'.offline');
             }
             // Process node recover end
         }

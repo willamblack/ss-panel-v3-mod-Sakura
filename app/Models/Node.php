@@ -115,20 +115,24 @@ class Node extends Model
         return Tools::flowAutoShow($traffic);
     }
 
+    /**
+     * Judge node status via database.
+     * @return bool
+     */
     public function isNodeOnline()
     {
-        $node_heartbeat = $this->attributes['node_heartbeat'];
+        $online_status = $this->attributes['online_status'];
         $sort = $this->attributes['sort'];
 
         if (!($sort == 0 || $sort == 7 || $sort == 8 || $sort==10)) {
             return null;
         }
 
-        if ($node_heartbeat == 0) {
+        if ($online_status == 0) {
             return null;
         }
 
-        if (time() - $node_heartbeat > 300) {
+        if ($online_status == -1) {
             return false;
         } else {
             return true;

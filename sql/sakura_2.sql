@@ -1,0 +1,1 @@
+ALTER TABLE `ss_node` ADD `online_status` INT(1) NULL DEFAULT '0' AFTER `status`;

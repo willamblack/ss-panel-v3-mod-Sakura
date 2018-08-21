@@ -434,9 +434,7 @@ class UserController extends BaseController
                             $node_heartbeat[$temp[0]]="在线";
                         }
                     } else {
-                        if (!isset($node_heartbeat[$temp[0]])) {
-                            $node_heartbeat[$temp[0]]="暂无数据";
-                        }
+                        $node_heartbeat[$temp[0]]="暂无数据";
                     }
 
                     if ($node->node_bandwidth_limit==0) {

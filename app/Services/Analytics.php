@@ -113,6 +113,6 @@ class Analytics
                 $query->Where('sort', '=', 0)
                     ->orWhere('sort', '=', 10);
             }
-        )->where('node_heartbeat', '>', time()-90)->count();
+        )->where('online_status', 1)->count();
     }
 }
