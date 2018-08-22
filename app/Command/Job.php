@@ -532,7 +532,7 @@ class Job
             }
 
             // Process node offline start
-            if ($node->isNodeOnline() == true && time() - $node->node_heartbeat > 90) {
+            if ($node->isNodeOnline() == true && time() - $node->node_heartbeat > 120) {
                 $node->online_status = -1;
                 $node->save();
                 if (Config::get('node_offline_warn') == 'true'){
@@ -558,7 +558,7 @@ class Job
                         $query->where('node_group', '=', $node->node_group)
                             ->orWhere('node_group', '=', 0);
                         }
-                    )->where('online_status', 1)->inRandomOrder()->first();
+                    )-whereRaw('UNIX_TIMESTAMP()-`node_heartbeat` < 60')->inRandomOrder()->first();
 
                     switch(Config::get('node_switcher'))
                     {
@@ -612,7 +612,7 @@ class Job
                             curl_setopt($RecUpdate, CURLOPT_CUSTOMREQUEST, 'PUT');
                             $post_data = '{"type":"CNAME","name":"'.$node->server.'","content":"'.$Temp_node->server.'","ttl":'.Config::get('cloudflare_ttl').'}';
                             curl_setopt($RecUpdate, CURLOPT_POSTFIELDS, $post_data);
-                            $CFResult = json_decode(curl_exec($RecUpdate),true)["success"];
+                            curl_exec($RecUpdate);
                             curl_close($RecUpdate);
                             break;
                     }
@@ -646,10 +646,10 @@ class Job
                 $notice_text = '喵喵喵~ '.$node->name.' 节点恢复了喵~';
                 if (($node->sort==0 || $node->sort==10) && Config::get('node_switcher') != 'none'){
                             if($node->dns_type==2){
-                        $origin_type = 'CNAME';
+                                $origin_type = 'CNAME';
                                 $origin_value = $node->dns_value;
                             }else{
-                        $origin_type = 'A';
+                                $origin_type = 'A';
                                 $origin_value = $node->node_ip;
                             }
                     switch(Config::get('node_switcher'))
