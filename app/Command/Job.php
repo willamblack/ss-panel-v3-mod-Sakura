@@ -558,7 +558,7 @@ class Job
                         $query->where('node_group', '=', $node->node_group)
                             ->orWhere('node_group', '=', 0);
                         }
-                    )-whereRaw('UNIX_TIMESTAMP()-`node_heartbeat` < 60')->inRandomOrder()->first();
+                    )->whereRaw('UNIX_TIMESTAMP() - `node_heartbeat` < 60')->inRandomOrder()->first();
 
                     switch(Config::get('node_switcher'))
                     {
