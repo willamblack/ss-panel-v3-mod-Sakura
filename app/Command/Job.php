@@ -627,7 +627,7 @@ class Job
             if ($node->isNodeOnline() == false && time() - $node->node_heartbeat < 60) {
                 $node->online_status = 1;
                 $node->save();
-                if (Config::get('node_offline_warn') == true){
+                if (Config::get('node_offline_warn') == 'true'){
                     $adminUser = User::where("is_admin", "=", "1")->get();
                     foreach ($adminUser as $user) {
                         $subject = Config::get('appName').'-系统提示';
